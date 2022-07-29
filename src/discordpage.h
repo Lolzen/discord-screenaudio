@@ -28,11 +28,13 @@ private:
   void injectVersion(QString version);
   void stopVirtmic();
   void startVirtmic(QString target);
+  void requestScreenCapture();
 
 private Q_SLOTS:
   void featurePermissionRequested(const QUrl &securityOrigin,
                                   QWebEnginePage::Feature feature);
   void startStream(QString target, uint width, uint height, uint frameRate);
+  void receiveSession(uint, QVariantMap);
 };
 
 // Will immediately get destroyed again but is needed for navigation to

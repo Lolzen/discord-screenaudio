@@ -16,6 +16,7 @@ string(TIMESTAMP TIMESTAMP %s)
 find_package(Qt5 CONFIG REQUIRED COMPONENTS 
   Widgets
   WebEngineWidgets
+  DBus
 )
 
 option(KF5NOTIFICATIONS "Use KF5Notifications for enhanced system notifications" ON)
@@ -56,7 +57,7 @@ add_subdirectory(submodules/rohrkabel)
 
 add_executable(discord-screenaudio ${discord-screenaudio_SRC})
 
-target_link_libraries(discord-screenaudio Qt5::Widgets Qt5::WebEngineWidgets rohrkabel)
+target_link_libraries(discord-screenaudio Qt5::Widgets Qt5::WebEngineWidgets Qt5::DBus rohrkabel)
 
 if(KF5NOTIFICATIONS)
   target_link_libraries(discord-screenaudio KF5::Notifications)

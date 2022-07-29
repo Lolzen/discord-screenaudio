@@ -2,8 +2,13 @@
 #include "virtmic.h"
 
 #include <QApplication>
+#include <QDBusConnection>
+#include <QDBusInterface>
+#include <QDBusMessage>
+#include <QDBusObjectPath>
 #include <QDesktopServices>
 #include <QFile>
+#include <QList>
 #include <QTimer>
 #include <QWebChannel>
 #include <QWebEngineScript>
@@ -136,11 +141,12 @@ void DiscordPage::javaScriptConsoleMessage(
     QWebEnginePage::JavaScriptConsoleMessageLevel level, const QString &message,
     int lineNumber, const QString &sourceID) {
   if (message == "!discord-screenaudio-start-stream") {
-    if (m_streamDialog.isHidden())
-      m_streamDialog.setHidden(false);
-    else
-      m_streamDialog.activateWindow();
-    m_streamDialog.updateTargets();
+    requestScreenCapture();
+    // if (m_streamDialog.isHidden())
+    //   m_streamDialog.setHidden(false);
+    // else
+    //   m_streamDialog.activateWindow();
+    // m_streamDialog.updateTargets();
   } else if (message == "!discord-screenaudio-stream-stopped") {
     stopVirtmic();
   } else {
@@ -159,4 +165,45 @@ void DiscordPage::startStream(QString target, uint width, uint height,
                       .arg(height)
                       .arg(frameRate));
   });
+}
+
+void DiscordPage::requestScreenCapture() {
+  QDBusInterface interface("org.freedesktop.portal.Desktop",
+                           "/org/freedesktop/portal/desktop",
+                           "org.freedesktop.portal.ScreenCast");
+
+  auto reply = interface.call(
+      "CreateSession",
+      QVariantMap{{"handle_token", "dsa"}, {"session_handle_token", "dsa"}});
+
+  auto path = reply.arguments()[0].value<QDBusObjectPath>().path();
+
+  if (path == "")
+    qFatal("Failed to create screencast session");
+
+  qDebug() << path;
+  qDebug() << QDBusConnection::sessionBus().connect(
+      "org.freedesktop.portal.Desktop", path, "org.freedesktop.portal.Request",
+      "Response", this, SLOT(receiveSession(uint, QVariantMap)));
+
+  // if (reply.type() != QDBusMessage::ReplyMessage)
+  //   qFatal("Call failed");
+
+  // if (reply.arguments().count() != 1 ||
+  //     reply.arguments()[0].type() != QVariant::List)
+  //   qFatal("Unexpected reply");
+
+  // qDebug() << reply.arguments()[0].toList();
+}
+
+void DiscordPage::receiveSession(uint response, QVariantMap results) {
+  auto session = QDBusObjectPath(results["session_handle"].toString());
+
+  QDBusInterface interface("org.freedesktop.portal.Desktop",
+                           "/org/freedesktop/portal/desktop",
+                           "org.freedesktop.portal.ScreenCast");
+
+  auto respo = interface.call("SelectSources", session, QVariantMap{});
+
+  qDebug() << respo;
 }
