@@ -24,6 +24,8 @@ if(KF5NOTIFICATIONS)
   find_package(KF5Notifications)
 endif()
 
+find_package(X11 REQUIRED)
+
 set(discord-screenaudio_SRC
   src/main.cpp
   src/mainwindow.cpp
@@ -31,6 +33,7 @@ set(discord-screenaudio_SRC
   src/discordpage.cpp
   src/streamdialog.cpp
   src/log.cpp
+  src/x11.cpp
   resources.qrc
 )
 
@@ -58,6 +61,8 @@ add_subdirectory(submodules/rohrkabel)
 add_executable(discord-screenaudio ${discord-screenaudio_SRC})
 
 target_link_libraries(discord-screenaudio Qt5::Widgets Qt5::WebEngineWidgets rohrkabel)
+target_link_libraries(discord-screenaudio ${X11_LIBRARIES} ${X11_Xrandr_LIB} )
+target_include_directories(discord-screenaudio SYSTEM PRIVATE ${X11_INCLUDE_DIR} ${X11_Xrandr_INCLUDE_PATH})
 
 if(KF5NOTIFICATIONS)
   target_link_libraries(discord-screenaudio KF5::Notifications)

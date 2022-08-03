@@ -1,6 +1,7 @@
 #include "discordpage.h"
 #include "log.h"
 #include "virtmic.h"
+#include "x11.h"
 
 #include <QApplication>
 #include <QDesktopServices>
@@ -157,9 +158,11 @@ void DiscordPage::startStream(QString target, uint width, uint height,
   startVirtmic(target);
   // Wait a bit for the virtmic to start
   QTimer::singleShot(target == "None" ? 0 : 200, [=]() {
-    runJavaScript(QString("window.discordScreenaudioStartStream(%1, %2, %3);")
-                      .arg(width)
-                      .arg(height)
-                      .arg(frameRate));
+    runJavaScript(
+        QString("window.discordScreenaudioStartStream(%1, %2, %3, %4);")
+            .arg(width)
+            .arg(height)
+            .arg(frameRate)
+            .arg(X11::getScreens()[0]));
   });
 }

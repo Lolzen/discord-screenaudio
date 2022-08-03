@@ -111,10 +111,20 @@ setInterval(() => {
 
       const initialDisplay = el.style.display;
 
-      window.discordScreenaudioStartStream = (width, height, frameRate) => {
+      window.discordScreenaudioStartStream = (
+        width,
+        height,
+        frameRate,
+        deviceId
+      ) => {
         setGetDisplayMedia({
           audio: true,
-          video: { width, height, frameRate },
+          video: {
+            width,
+            height,
+            frameRate,
+            deviceId,
+          },
         });
         el.click();
         el.style.display = initialDisplay;
