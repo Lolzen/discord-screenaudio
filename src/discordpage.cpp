@@ -159,10 +159,11 @@ void DiscordPage::startStream(QString target, uint width, uint height,
   // Wait a bit for the virtmic to start
   QTimer::singleShot(target == "None" ? 0 : 200, [=]() {
     runJavaScript(
-        QString("window.discordScreenaudioStartStream(%1, %2, %3, '%4');")
+        QString(
+            "window.discordScreenaudioStartStream(%1, %2, %3, 'screen:%4:0');")
             .arg(width)
             .arg(height)
             .arg(frameRate)
-            .arg("92"));
+            .arg(X11::getScreens()[0]));
   });
 }

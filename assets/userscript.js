@@ -57,14 +57,19 @@ function setGetDisplayMedia(mediaSource, overrideArgs = undefined) {
       },
     });
     let [track] = captureSystemAudioStream.getAudioTracks();
+    console.log("Sharing screen", mediaSource);
     const gdm = await navigator.mediaDevices.getUserMedia({
+      audio: false,
       video: {
         mandatory: {
           chromeMediaSource: "desktop",
           chromeMediaSourceId: mediaSource,
+          minWidth: 1280,
+          maxWidth: 1280,
+          minHeight: 720,
+          maxHeight: 720,
         },
       },
-      audio: true,
     });
     gdm.addTrack(track);
     return gdm;
