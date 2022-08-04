@@ -23,8 +23,10 @@ QVector<QString> getTargets() {
 
           if (info.props.count("node.name")) {
             auto name = QString::fromStdString(info.props["node.name"]);
-            if (!targets.contains(name))
+            if (!targets.contains(name)) {
               targets.append(name);
+              qDebug() << name << global.id;
+            }
           }
         }
       });

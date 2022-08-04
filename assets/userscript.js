@@ -25,7 +25,7 @@ const getAudioDevice = async (nameOfAudioDevice) => {
   return audioDevice;
 };
 
-function setGetDisplayMedia(overrideArgs = undefined) {
+function setGetDisplayMedia(mediaSource, overrideArgs = undefined) {
   const getDisplayMedia = async (...args) => {
     var id;
     try {
@@ -57,11 +57,15 @@ function setGetDisplayMedia(overrideArgs = undefined) {
       },
     });
     let [track] = captureSystemAudioStream.getAudioTracks();
-    const gdm = await navigator.mediaDevices.chromiumGetDisplayMedia(
-      ...(overrideArgs
-        ? [overrideArgs]
-        : args || [{ video: true, audio: true }])
-    );
+    const gdm = await navigator.mediaDevices.getUserMedia({
+      video: {
+        mandatory: {
+          chromeMediaSource: "desktop",
+          chromeMediaSourceId: mediaSource,
+        },
+      },
+      audio: true,
+    });
     gdm.addTrack(track);
     return gdm;
   };
@@ -117,13 +121,12 @@ setInterval(() => {
         frameRate,
         deviceId
       ) => {
-        setGetDisplayMedia({
+        setGetDisplayMedia(deviceId, {
           audio: true,
           video: {
             width,
             height,
             frameRate,
-            deviceId,
           },
         });
         el.click();
